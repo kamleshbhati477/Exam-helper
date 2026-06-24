@@ -14,6 +14,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Game route
+app.get('/game', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'game', 'index.html'));
+});
+
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
