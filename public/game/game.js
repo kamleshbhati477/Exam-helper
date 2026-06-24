@@ -247,6 +247,7 @@ class GameEngine {
         // Game states
         this.gameState = 'menu'; // menu, playing, paused, gameOver
         this.score = 0;
+        this.enemiesDefeated = 0;
         this.time = 0;
         this.frameCount = 0;
 
@@ -295,7 +296,7 @@ class GameEngine {
 
         this.canvas.addEventListener('click', () => {
             if (this.gameState === 'playing') {
-                this.player.attack();
+                this.attack();
             }
         });
 
@@ -330,14 +331,10 @@ class GameEngine {
         });
 
         this.canvas.addEventListener('touchend', (e) => {
-            this.touchStart = null;
-        });
-
-        // Tap to attack
-        this.canvas.addEventListener('touchend', (e) => {
             if (this.gameState === 'playing' && Date.now() - (this.touchStart?.time || 0) < 200) {
-                this.player.attack();
+                this.attack();
             }
+            this.touchStart = null;
         });
     }
 
@@ -359,7 +356,8 @@ class GameEngine {
 
         // Attack input
         if (this.keys[' ']) {
-            if (this.player.attack()) {
+            if (this.player.canAttack()) {
+                this.attack();
                 this.keys[' '] = false; // Consume key
             }
         }
@@ -430,6 +428,7 @@ class GameEngine {
             if (enemy.health <= 0) {
                 this.enemies.splice(i, 1);
                 this.score += (enemy.type === 'strong' ? 50 : 20);
+                this.enemiesDefeated++;
                 this.createExplosion(enemy.pos);
             }
         }
@@ -457,10 +456,10 @@ class GameEngine {
         const attackArea = this.player.getAttackArea();
         for (let enemy of this.enemies) {
             const dist = Math.sqrt(
-                Math.pow(enemy.pos.x - this.player.pos.x, 2) +
-                Math.pow(enemy.pos.y - this.player.pos.y, 2)
+                Math.pow(enemy.pos.x - attackArea.x, 2) +
+                Math.pow(enemy.pos.y - attackArea.y, 2)
             );
-            if (dist < 80) {
+            if (dist < attackArea.radius) {
                 enemy.takeDamage(this.player.attackDamage);
                 this.createHitEffect(enemy.pos);
             }
@@ -521,10 +520,13 @@ class GameEngine {
                 p.life--;
 
                 const alpha = p.life / p.maxLife;
-                this.ctx.fillStyle = p.color.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
+                this.ctx.save();
+                this.ctx.globalAlpha = alpha;
+                this.ctx.fillStyle = p.color;
                 this.ctx.beginPath();
                 this.ctx.arc(p.pos.x, p.pos.y, 3, 0, Math.PI * 2);
                 this.ctx.fill();
+                this.ctx.restore();
 
                 p.pos = p.pos.add(p.vel);
 
@@ -569,6 +571,15 @@ class GameEngine {
     }
 
     updateUI() {
+        if (!this.player) {
+            document.getElementById('healthValue').textContent = '0/0';
+            document.getElementById('healthFill').style.width = '0%';
+            document.getElementById('scoreValue').textContent = this.score;
+            document.getElementById('timeValue').textContent = this.time + 's';
+            document.getElementById('enemyValue').textContent = this.enemies.length;
+            return;
+        }
+
         document.getElementById('healthValue').textContent = `${Math.ceil(this.player.health)}/${this.player.maxHealth}`;
         document.getElementById('healthFill').style.width = `${(this.player.health / this.player.maxHealth) * 100}%`;
         document.getElementById('scoreValue').textContent = this.score;
@@ -582,7 +593,7 @@ class GameEngine {
         gameOverStats.innerHTML = `
             <p><strong>Score:</strong> ${this.score}</p>
             <p><strong>Survival Time:</strong> ${this.time}s</p>
-            <p><strong>Enemies Defeated:</strong> ${Math.floor(this.score / 20)}</p>
+            <p><strong>Enemies Defeated:</strong> ${this.enemiesDefeated}</p>
         `;
         gameOverScreen.classList.remove('hidden');
     }
@@ -590,6 +601,7 @@ class GameEngine {
     startGame() {
         this.gameState = 'playing';
         this.score = 0;
+        this.enemiesDefeated = 0;
         this.time = 0;
         this.frameCount = 0;
         this.enemies = [];
@@ -623,6 +635,9 @@ class GameEngine {
     resetGame() {
         this.gameState = 'menu';
         this.player = null;
+        this.score = 0;
+        this.enemiesDefeated = 0;
+        this.time = 0;
         this.enemies = [];
         this.particles = [];
         document.getElementById('gameOverScreen').classList.add('hidden');

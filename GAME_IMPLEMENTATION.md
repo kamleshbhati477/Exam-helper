@@ -54,7 +54,7 @@ An offline, fully-functional battle survival game has been successfully created 
   - Normal: 30 HP, 5 damage, 2 speed
   - Strong: 50 HP, 8 damage, 2.5 speed, yellow color
 
-- ✅ **Screen wrapping** - game boundaries prevent going out of bounds
+- ✅ **Boundary clamping** - game boundaries prevent going out of bounds
 
 ## 📁 Project Structure
 
@@ -65,7 +65,7 @@ Exam-helper/
 │   └── game/
 │       ├── index.html             # Game HTML structure
 │       ├── styles.css             # Game styling & responsive design
-│       ├── game.js                # Complete game engine (~850 lines)
+│       ├── game.js                # Complete game engine
 │       ├── README.md              # Game documentation
 │       └── assets/                # (Future) For images/sounds
 ├── server.js                      # Express server (updated with /game route)
@@ -253,7 +253,7 @@ For questions or issues:
 ## 🎉 Summary
 
 A fully-functional, offline battle survival game has been successfully created with:
-- **900+ lines of well-structured JavaScript code**
+- **Well-structured JavaScript game engine code**
 - **Responsive design for all devices**
 - **Multiple control schemes** (keyboard, mouse, touch)
 - **Progressive difficulty** and game progression

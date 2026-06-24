@@ -38,13 +38,11 @@ Survive as long as possible by defeating enemies. Each enemy defeated earns you 
 4. **Difficulty Scaling**:
    - Spawn rate increases every 10 seconds
    - Maximum number of simultaneous enemies increases
-   - Boss enemies occasionally appear as difficulty increases
 
 ### Scoring
 
 - **Normal Enemy**: +20 points
 - **Strong Enemy**: +50 points
-- **Survival Bonus**: 1 point per second survived
 
 ## Game States
 
@@ -80,7 +78,7 @@ Survive as long as possible by defeating enemies. Each enemy defeated earns you 
 
 - **Engine**: Custom JavaScript game engine with HTML5 Canvas
 - **Physics**: Simple vector-based physics system
-- **Collision**: AABB collision detection
+- **Collision**: Distance/radius-based collision detection
 - **Performance**: 60 FPS target with optimized rendering
 
 ## Future Enhancements
